@@ -22,15 +22,31 @@ public class MainActivity extends AppCompatActivity {
     TextView debugText;
     int[] blockRowType1, blockRowType2;
     Queue<int[]> routeList;
+    Queue<int[]> targetShelf;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        debugText = findViewById(R.id.DebugText);
+
+        gridLayout = findViewById(R.id.GridLayout);
+        gridLayout.setRowCount(10);
+        gridLayout.setColumnCount(7);
+
+        //Client.getMapData();
         blockRowType1 = new int[]{0, 1, 1, 0, 1, 1, 0};
         blockRowType2 = new int[]{2, 3, 3, 2, 3, 3, 2};
 
+        //Client.getTargetShelf();
+        targetShelf = new LinkedList<int[]>();
+        targetShelf.add(new int[] {1, 4});
+        targetShelf.add(new int[] {1, 5});
+        targetShelf.add(new int[] {2, 1});
+        targetShelf.add(new int[] {2, 2});
+
+        //Client.getRoute();
         routeList = new LinkedList<int[]>();
         routeList.add(new int[] {0, 0});
         routeList.add(new int[] {0, 3});
@@ -45,13 +61,6 @@ public class MainActivity extends AppCompatActivity {
         routeList.add(new int[] {3, 1});
         routeList.add(new int[] {3, 2});
         routeList.add(new int[] {3, 3});
-
-        debugText = findViewById(R.id.DebugText);
-
-        gridLayout = findViewById(R.id.GridLayout);
-
-        gridLayout.setRowCount(10);
-        gridLayout.setColumnCount(7);
 
         /*
         for (int i = 0; i < 5; i++) {
@@ -122,9 +131,9 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             v = getLayoutInflater().inflate(R.layout.shelf, null);
 
-                            if (!routeList.isEmpty() && routeList.peek()[0] == i && routeList.peek()[1] == j) {
-                                v.findViewById(R.id.ShelfCard).setBackgroundColor(Color.RED);
-                                routeList.poll();
+                            if (!targetShelf.isEmpty() && targetShelf.peek()[0] == i && targetShelf.peek()[1] == j) {
+                                v.findViewById(R.id.ShelfCard).setBackgroundColor(Color.YELLOW);
+                                targetShelf.poll();
                             }
 
                             int finalI = i;
