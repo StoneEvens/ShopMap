@@ -32,13 +32,6 @@
                 android:clickable="false"
                 android:contextClickable="true" />
 
-            <ImageView
-                android:id="@+id/ImageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:clickable="false"
-                android:src="@drawable/skin_elena" />
-
         </FrameLayout>
 
     </com.otaliastudios.zoom.ZoomLayout>

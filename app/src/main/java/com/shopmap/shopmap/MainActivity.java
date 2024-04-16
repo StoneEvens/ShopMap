@@ -3,6 +3,7 @@ package com.shopmap.shopmap;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,25 +14,50 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class MainActivity extends AppCompatActivity {
     GridLayout gridLayout;
     TextView debugText;
+    int[] blockRowType1, blockRowType2;
+    Queue<int[]> routeList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        blockRowType1 = new int[]{0, 1, 1, 0, 1, 1, 0};
+        blockRowType2 = new int[]{2, 3, 3, 2, 3, 3, 2};
+
+        routeList = new LinkedList<int[]>();
+        routeList.add(new int[] {0, 0});
+        routeList.add(new int[] {0, 3});
+        routeList.add(new int[] {0, 4});
+        routeList.add(new int[] {0, 5});
+        routeList.add(new int[] {0, 6});
+        routeList.add(new int[] {1, 0});
+        routeList.add(new int[] {1, 3});
+        routeList.add(new int[] {2, 0});
+        routeList.add(new int[] {2, 3});
+        routeList.add(new int[] {3, 0});
+        routeList.add(new int[] {3, 1});
+        routeList.add(new int[] {3, 2});
+        routeList.add(new int[] {3, 3});
+
         debugText = findViewById(R.id.DebugText);
 
         gridLayout = findViewById(R.id.GridLayout);
 
-        gridLayout.setRowCount(5);
-        gridLayout.setColumnCount(5);
+        gridLayout.setRowCount(10);
+        gridLayout.setColumnCount(7);
 
+        /*
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
-                View v = new View(getBaseContext());
+                View v;
+
                 if (i%2 == 0 && j%2 == 1) {
                     v = getLayoutInflater().inflate(R.layout.vertcalwalkway, null);
                 } else if (i%2 == 1 && j%2 == 0) {
@@ -61,6 +87,70 @@ public class MainActivity extends AppCompatActivity {
 
                 gridLayout.addView(v, params);
             }
+        }
+
+         */
+        try {
+            for (int i = 0; i < gridLayout.getRowCount(); i++) {
+                for (int j = 0; j < gridLayout.getColumnCount(); j++) {
+                    View v;
+
+                    if (i%3 == 0) {
+                        if (blockRowType1[j] == 0) {
+                            v = getLayoutInflater().inflate(R.layout.intersection, null);
+
+                            if (!routeList.isEmpty() && routeList.peek()[0] == i && routeList.peek()[1] == j) {
+                                v.findViewById(R.id.IntersectionCard).setBackgroundColor(Color.RED);
+                                routeList.poll();
+                            }
+                        } else {
+                            v = getLayoutInflater().inflate(R.layout.horizontalwalkway, null);
+
+                            if (!routeList.isEmpty() && routeList.peek()[0] == i && routeList.peek()[1] == j) {
+                                v.findViewById(R.id.HorizontalWalkwayCard).setBackgroundColor(Color.RED);
+                                routeList.poll();
+                            }
+                        }
+                    } else {
+                        if (blockRowType2[j] == 2) {
+                            v = getLayoutInflater().inflate(R.layout.vertcalwalkway, null);
+
+                            if (!routeList.isEmpty() && routeList.peek()[0] == i && routeList.peek()[1] == j) {
+                                v.findViewById(R.id.VerticalWalkwayCard).setBackgroundColor(Color.RED);
+                                routeList.poll();
+                            }
+                        } else {
+                            v = getLayoutInflater().inflate(R.layout.shelf, null);
+
+                            if (!routeList.isEmpty() && routeList.peek()[0] == i && routeList.peek()[1] == j) {
+                                v.findViewById(R.id.ShelfCard).setBackgroundColor(Color.RED);
+                                routeList.poll();
+                            }
+
+                            int finalI = i;
+                            int finalJ = j;
+                            v.findViewById(R.id.ShelfCard).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Log.i("Debug", "Triggered");
+                                    debugText.setText(String.format("Shelf %d%d Selected", finalI, finalJ));
+                                }
+                            });
+                        }
+                    }
+
+                    GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+
+                    params.columnSpec = GridLayout.spec(j, 1, 1);
+                    params.rowSpec = GridLayout.spec(i, 1, 1);
+
+                    gridLayout.addView(v, params);
+                }
+            }
+        } catch (NullPointerException e1) {
+            debugText.setText(e1.toString());
         }
     }
 }
