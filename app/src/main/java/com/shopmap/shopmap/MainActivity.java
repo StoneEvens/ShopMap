@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 for (int j = 0; j < gridLayout.getColumnCount(); j++) {
                     View v;
 
+                    //Needs to be re-write when actual program is being done
                     if (i%3 == 0) {
                         if (blockRowType1[j] == 0) {
                             v = getLayoutInflater().inflate(R.layout.intersection, null);
@@ -142,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void onClick(View v) {
                                     Log.i("Debug", "Triggered");
-                                    debugText.setText(String.format("Shelf %d%d Selected", finalI, finalJ));
+                                    debugText.setText(String.format("Shelf %d,%d Selected", finalI, finalJ));
                                 }
                             });
                         }
@@ -158,6 +160,14 @@ public class MainActivity extends AppCompatActivity {
                     gridLayout.addView(v, params);
                 }
             }
+
+            if (!routeList.isEmpty() || !targetShelf.isEmpty()) {
+                debugText.setText("Error Occured When Constructing Map");
+            } else {
+                debugText.setText("Map Successfully Constructed");
+                Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
+            }
+
         } catch (NullPointerException e1) {
             debugText.setText(e1.toString());
         }
