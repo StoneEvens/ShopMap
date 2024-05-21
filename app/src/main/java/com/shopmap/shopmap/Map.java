@@ -1,5 +1,7 @@
 package com.shopmap.shopmap;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 public class Map {
@@ -17,8 +19,6 @@ public class Map {
     public void constructMap(String storeID) {
         aisles = new ArrayList<Aisle>();
         shelves = new ArrayList<Shelf>();
-        //This should be storeInfo = ts.getStoreInfo(values);
-        //storeInfo = ;
 
         getData(client.getStoreInfo(storeID));
     }
@@ -173,5 +173,9 @@ public class Map {
 
     public Intersection getEnd() {
         return (Intersection) getMapElement(storeInfo[3]);
+    }
+
+    public String[] getStoreInfo() {
+        return storeInfo;
     }
 }

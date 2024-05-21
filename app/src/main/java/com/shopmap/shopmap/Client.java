@@ -1,8 +1,11 @@
 package com.shopmap.shopmap;
 
+import android.util.Log;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -16,7 +19,7 @@ public class Client {
     private String ip;
 
     public Client() {
-        ip = "192.168.0.0";
+        ip = "192.168.168.174";
         connected = true;
         input = "";
 
@@ -71,12 +74,16 @@ public class Client {
             @Override
             public void run() {
                 try {
-                    if (!output.isEmpty()) {
+                    if (!output.equals("")) {
+                        Log.i("Debug", "Request Sent to Server");
+                        Log.i("Debug", output);
                         dos.writeUTF(output);
+                        Log.i("Debug", "Request Stored");
                         dos.flush();
+                        Log.i("Debug", "Request Flushed");
                     }
                 } catch (IOException e1) {
-
+                    Log.i("Debug", "Something is Fucked");
                 } catch (NullPointerException e2) {
 
                 }
@@ -85,10 +92,12 @@ public class Client {
 
         thread.start();
 
-        while (connected && !update) {
-            for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100; i++) {
+            Log.i("Debug", String.format("%s, %s", connected, update));
+
+            if (connected && !update) {
                 try {
-                    TimeUnit.MILLISECONDS.wait(100);
+                    TimeUnit.MILLISECONDS.sleep(100);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -107,7 +116,7 @@ public class Client {
 
         while (!update) {
             try {
-                TimeUnit.MILLISECONDS.wait(100);
+                TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e1) {
 
             }
@@ -136,5 +145,33 @@ public class Client {
         String[] path = input.split("/->/");
 
         return path;
+    }
+
+    public ArrayList<ArrayList<String>> getMap(String storeID) {
+        sendOutput(String.format("getMap/cmdend/%s", storeID));
+
+        while (!update) {
+            try {
+                TimeUnit.MILLISECONDS.wait(100);
+            } catch (InterruptedException e1) {
+
+            }
+        }
+
+        String[] temp = input.split("/SPLIT/");
+        ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
+
+        for (String li: temp) {
+            ArrayList<String> resultArray = new ArrayList<String>();
+            String[] sTemp = li.split("/ADD/");
+
+            for (String s: sTemp) {
+                resultArray.add(s);
+            }
+
+            result.add(resultArray);
+        }
+
+        return result;
     }
 }
