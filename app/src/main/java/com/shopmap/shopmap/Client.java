@@ -5,9 +5,10 @@ import android.util.Log;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.Socket;
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class Client {
@@ -19,14 +20,14 @@ public class Client {
     private String ip;
 
     public Client() {
-        ip = "192.168.168.174";
+        ip = "192.168.40.128";
         connected = true;
         input = "";
 
         getConnection();
     }
 
-    private void getConnection() {
+    public void getConnection() {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -124,15 +125,18 @@ public class Client {
 
         String[] storeInfo = input.split("/SPLIT/");
 
+        input = "";
+        update = false;
+
         return storeInfo;
     }
 
-    public String[] getPath(ArrayList<String> targets) {
+    public ArrayList<String> getPath(ArrayList<String> targets) {
         String temp = "";
         for (String s: targets) {
             temp += String.format("%s/ADD/", s);
         }
-        sendOutput(String.format("calculatePath/cmdend/%s", temp));
+        sendOutput(String.format("calculatePath/cmdend/%s", "test"));
 
         while (!update) {
             try {
@@ -142,7 +146,11 @@ public class Client {
             }
         }
 
-        String[] path = input.split("/->/");
+        ArrayList<String> path = new ArrayList<String>();
+        path.addAll(Arrays.asList(input.split("/->/")));
+
+        input = "";
+        update = false;
 
         return path;
     }

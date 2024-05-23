@@ -1,8 +1,10 @@
 package com.shopmap.shopmap;
 
+import androidx.annotation.ColorRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,6 +23,9 @@ public class MainActivity extends AppCompatActivity {
     Map map;
     GridLayout gridLayout;
     TextView debugText;
+    Button testButton, resetButton;
+    ReconnectDialog dialog;
+    int total_Row, total_Col;
 
     public MainActivity() throws InterruptedException {
         client = new Client();
@@ -28,7 +33,35 @@ public class MainActivity extends AppCompatActivity {
 
         TimeUnit.MILLISECONDS.sleep(100);
 
+        dialog = new ReconnectDialog(client);
         map.constructMap("1");
+
+        check();
+    }
+
+    public void check() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (this) {
+                    while (true) {
+                        try {
+                            if (client.getConnected() == false) {
+                                if (!dialog.isAdded()) {
+                                    dialog.show(MainActivity.this.getFragmentManager(), "");
+                                    //client.setIp(ipInput.getText().toString());
+                                }
+                            }
+                            Log.i("Client Status", String.format("%s", client.getConnected()));
+                            this.wait(10000 * dialog.getMultiplier());
+                        } catch (InterruptedException e) {
+
+                        }
+                    }
+                }
+            }
+        });
+        thread.start();
     }
 
     @Override
@@ -36,16 +69,55 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        total_Row = Integer.parseInt(map.getStoreInfo()[0]);
+        total_Col = Integer.parseInt(map.getStoreInfo()[1]);
+
         debugText = findViewById(R.id.DebugText);
 
         gridLayout = findViewById(R.id.GridLayout);
+        testButton = findViewById(R.id.pathButton);
+        testButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resetMap();
 
-        int total_Row = Integer.parseInt(map.getStoreInfo()[0]);
-        int total_Col = Integer.parseInt(map.getStoreInfo()[1]);
+                ArrayList<String> order = new ArrayList<String>();
+                
+                try {
+                    order = client.getPath(new ArrayList<String>());
+                } catch (Exception e) {
+                    if (!dialog.isAdded()) {
+                        dialog.show(MainActivity.this.getFragmentManager(), "Reconnect");
+                    }
+                }
 
+                String testOutput = "";
+                for (String s: order) {
+                    testOutput += (s + "->");
+                }
+                for (String s: order) {
+                    MapElement mE = map.getMapElement(s);
+                    int index = mE.getRow() * total_Col + mE.getCol();
 
-        gridLayout.setRowCount(7);
-        gridLayout.setColumnCount(7);
+                    View view = gridLayout.getChildAt(index);
+                    CardView cv = view.findViewById(R.id.ShelfCard);
+                    cv.setCardBackgroundColor(Color.RED);
+                }
+
+                debugText.setText(testOutput);
+            }
+        });
+
+        resetButton = findViewById(R.id.resetButton);
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resetMap();
+            }
+        });
+
+        gridLayout.setRowCount(total_Row);
+        gridLayout.setColumnCount(total_Col);
         /*
         int i = 0;
 
@@ -176,5 +248,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }
          */
+    }
+
+    private void resetMap() {
+        for (Shelf s: map.getShelves()) {
+            int index = s.getRow() * total_Col + s.getCol();
+
+            View view = gridLayout.getChildAt(index);
+            CardView cv = view.findViewById(R.id.ShelfCard);
+            cv.setCardBackgroundColor(Color.WHITE);
+        }
     }
 }
