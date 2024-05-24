@@ -163,6 +163,10 @@ public class Map {
         return mapElement;
     }
 
+    public MapElement getMapElement(int row, int col) {
+        return mapElements[row][col];
+    }
+
     public ArrayList<Shelf> getShelves() {
         return shelves;
     }

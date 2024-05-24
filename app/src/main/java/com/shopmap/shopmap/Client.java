@@ -21,7 +21,7 @@ public class Client {
 
     public Client() {
         ip = "192.168.40.128";
-        connected = true;
+        connected = false;
         input = "";
 
         getConnection();
@@ -31,8 +31,6 @@ public class Client {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                connected = true;
-
                 try {
                     socket = new Socket(ip, 800);
 
@@ -40,6 +38,8 @@ public class Client {
                     dos = new DataOutputStream(socket.getOutputStream());
 
                     output = "";
+
+                    connected = true;
 
                     while (connected) {
                         String temp = "";
@@ -155,8 +155,8 @@ public class Client {
         return path;
     }
 
-    public ArrayList<ArrayList<String>> getMap(String storeID) {
-        sendOutput(String.format("getMap/cmdend/%s", storeID));
+    public void getProduct(String shelfID) {
+        sendOutput(String.format("getProducts/cmdend/%s", shelfID));
 
         while (!update) {
             try {
@@ -166,20 +166,7 @@ public class Client {
             }
         }
 
-        String[] temp = input.split("/SPLIT/");
-        ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
-
-        for (String li: temp) {
-            ArrayList<String> resultArray = new ArrayList<String>();
-            String[] sTemp = li.split("/ADD/");
-
-            for (String s: sTemp) {
-                resultArray.add(s);
-            }
-
-            result.add(resultArray);
-        }
-
-        return result;
+        input = "";
+        update = false;
     }
 }

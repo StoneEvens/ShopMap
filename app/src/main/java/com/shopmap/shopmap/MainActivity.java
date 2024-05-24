@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.TextView;
@@ -25,16 +26,21 @@ public class MainActivity extends AppCompatActivity {
     TextView debugText;
     Button testButton, resetButton;
     ReconnectDialog dialog;
+    ArrayList<Shelf> targetShelves;
     int total_Row, total_Col;
 
     public MainActivity() throws InterruptedException {
         client = new Client();
+
+        while (!client.getConnected()) {
+            TimeUnit.MILLISECONDS.sleep(100);
+        }
+
         map = new Map(client);
-
-        TimeUnit.MILLISECONDS.sleep(100);
-
         dialog = new ReconnectDialog(client);
         map.constructMap("1");
+
+        targetShelves = new ArrayList<Shelf>();
 
         check();
     }
@@ -67,6 +73,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_main);
 
         total_Row = Integer.parseInt(map.getStoreInfo()[0]);
@@ -118,52 +127,6 @@ public class MainActivity extends AppCompatActivity {
 
         gridLayout.setRowCount(total_Row);
         gridLayout.setColumnCount(total_Col);
-        /*
-        int i = 0;
-
-        for (ArrayList<String> li: client.getMap("1")) {
-            int j = 0;
-
-            for (String s: li) {
-                View v = new View(getBaseContext());
-
-                if (s.equals("Itsc")) {
-                    v = getLayoutInflater().inflate(R.layout.intersection, null);
-                } else if (s.equals("Shelf")) {
-                    v = getLayoutInflater().inflate(R.layout.shelf, null);
-
-                    CardView cv = v.findViewById(R.id.ShelfCard);
-
-                    cv.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Log.i("Debug", "Triggered");
-                            debugText.setText("Shelf Selected");
-                        }
-                    });
-                } else if (s.equals("HWalkway")) {
-                    v = getLayoutInflater().inflate(R.layout.horizontalwalkway, null);
-                } else if (s.equals("VWalkway")) {
-                    v = getLayoutInflater().inflate(R.layout.vertcalwalkway, null);
-                }
-
-                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-
-                params.columnSpec = GridLayout.spec(j, 1, 1);
-                params.rowSpec = GridLayout.spec(i, 1, 1);
-
-                gridLayout.addView(v, params);
-
-                j++;
-            }
-
-            i++;
-        }
-
-         */
-
 
         int i = 0;
         for (MapElement[] li: map.getMapElements()) {
@@ -178,11 +141,21 @@ public class MainActivity extends AppCompatActivity {
 
                     CardView cv = v.findViewById(R.id.ShelfCard);
 
+                    View finalV = v;
                     cv.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(View v) {
+                        public void onClick(View view) {
                             Log.i("Debug", "Triggered");
-                            debugText.setText("Shelf Selected");
+                            //debugText.setText("Shelf Selected");
+                            int index = gridLayout.indexOfChild(finalV);
+                            int row = (int) Math.floor(index / total_Col);
+                            int col = index%total_Col;
+                            MapElement element = map.getMapElement(row, col);
+                            client.getProduct(element.getName());
+
+                            if (targetShelves.size() <= 20) {
+                                targetShelves.add((Shelf) element);
+                            }
                         }
                     });
                 } else if (mE instanceof Walkway) {
@@ -207,47 +180,6 @@ public class MainActivity extends AppCompatActivity {
 
             i++;
         }
-
-
-
-        /*
-        for (int i = 0; i < 7; i++) {
-            for (int j = 0; j < 7; j++) {
-                View v = new View(getBaseContext());
-
-                if (i%3 == 0 || j%3 == 0) {
-                    if (i%3 == 0 && j%3 == 0) {
-                        v = getLayoutInflater().inflate(R.layout.intersection, null);
-                    } else if (i%3 == 0) {
-                        v = getLayoutInflater().inflate(R.layout.vertcalwalkway, null);
-                    } else {
-                        v = getLayoutInflater().inflate(R.layout.horizontalwalkway, null);
-                    }
-                } else {
-                    v = getLayoutInflater().inflate(R.layout.shelf, null);
-
-                    CardView cv = v.findViewById(R.id.ShelfCard);
-
-                    cv.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Log.i("Debug", "Triggered");
-                            debugText.setText("Shelf Selected");
-                        }
-                    });
-                }
-
-                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-
-                params.columnSpec = GridLayout.spec(i, 1, 1);
-                params.rowSpec = GridLayout.spec(j, 1, 1);
-
-                gridLayout.addView(v, params);
-            }
-        }
-         */
     }
 
     private void resetMap() {
