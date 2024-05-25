@@ -20,7 +20,7 @@ public class Client {
     private String ip;
 
     public Client() {
-        ip = "192.168.40.128";
+        ip = "192.168.168.174";
         connected = false;
         input = "";
 

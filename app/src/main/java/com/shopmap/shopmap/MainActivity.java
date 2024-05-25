@@ -1,20 +1,16 @@
 package com.shopmap.shopmap;
 
-import androidx.annotation.ColorRes;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         dialog = new ReconnectDialog(client);
         map.constructMap("1");
 
-        targetShelves = new ArrayList<String>();
+        targetShelves = new ArrayList<>();
 
         check();
     }
@@ -52,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
                 synchronized (this) {
                     while (true) {
                         try {
-                            if (client.getConnected() == false) {
+                            if (!client.getConnected()) {
                                 if (!dialog.isAdded()) {
                                     dialog.show(MainActivity.this.getFragmentManager(), "");
                                     //client.setIp(ipInput.getText().toString());
@@ -88,35 +84,36 @@ public class MainActivity extends AppCompatActivity {
         testButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                resetMap();
+                if (!targetShelves.isEmpty()) {
+                    ArrayList<String> order = new ArrayList<String>();
 
-                ArrayList<String> order = new ArrayList<String>();
-                
-                try {
-                    order = client.getPath(targetShelves);
-                } catch (Exception e) {
-                    if (!dialog.isAdded()) {
-                        dialog.show(MainActivity.this.getFragmentManager(), "Reconnect");
+                    try {
+                        order = client.getPath(targetShelves);
+                    } catch (Exception e) {
+                        if (!dialog.isAdded()) {
+                            dialog.show(MainActivity.this.getFragmentManager(), "Reconnect");
+                        }
                     }
+
+                    resetMap();
+                    targetShelves.clear();
+
+                    String testOutput = "";
+                    for (String s: order) {
+                        testOutput += (s + "->");
+                    }
+                    for (String s: order) {
+                        MapElement mE = map.getMapElement(s);
+                        int index = mE.getRow() * total_Col + mE.getCol();
+
+                        View view = gridLayout.getChildAt(index);
+                        CardView cv = view.findViewById(R.id.ShelfCard);
+                        cv.setCardBackgroundColor(Color.RED);
+                    }
+                    //Send product list to back end to save it in the database
+
+                    debugText.setText(testOutput);
                 }
-
-                targetShelves.clear();
-
-                String testOutput = "";
-                for (String s: order) {
-                    testOutput += (s + "->");
-                }
-                for (String s: order) {
-                    MapElement mE = map.getMapElement(s);
-                    int index = mE.getRow() * total_Col + mE.getCol();
-
-                    View view = gridLayout.getChildAt(index);
-                    CardView cv = view.findViewById(R.id.ShelfCard);
-                    cv.setCardBackgroundColor(Color.RED);
-                }
-                //Send product list to back end to save it in the database
-
-                debugText.setText(testOutput);
             }
         });
 
