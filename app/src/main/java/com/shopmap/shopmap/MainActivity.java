@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     TextView debugText;
     Button testButton, resetButton;
     ReconnectDialog dialog;
-    ArrayList<Shelf> targetShelves;
+    ArrayList<String> targetShelves;
     int total_Row, total_Col;
 
     public MainActivity() throws InterruptedException {
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         dialog = new ReconnectDialog(client);
         map.constructMap("1");
 
-        targetShelves = new ArrayList<Shelf>();
+        targetShelves = new ArrayList<String>();
 
         check();
     }
@@ -93,12 +93,14 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList<String> order = new ArrayList<String>();
                 
                 try {
-                    order = client.getPath(new ArrayList<String>());
+                    order = client.getPath(targetShelves);
                 } catch (Exception e) {
                     if (!dialog.isAdded()) {
                         dialog.show(MainActivity.this.getFragmentManager(), "Reconnect");
                     }
                 }
+
+                targetShelves.clear();
 
                 String testOutput = "";
                 for (String s: order) {
@@ -112,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
                     CardView cv = view.findViewById(R.id.ShelfCard);
                     cv.setCardBackgroundColor(Color.RED);
                 }
+                //Send product list to back end to save it in the database
 
                 debugText.setText(testOutput);
             }
@@ -153,8 +156,10 @@ public class MainActivity extends AppCompatActivity {
                             MapElement element = map.getMapElement(row, col);
                             client.getProduct(element.getName());
 
+                            cv.setCardBackgroundColor(Color.RED);
+
                             if (targetShelves.size() <= 20) {
-                                targetShelves.add((Shelf) element);
+                                targetShelves.add(element.getName());
                             }
                         }
                     });
@@ -190,5 +195,7 @@ public class MainActivity extends AppCompatActivity {
             CardView cv = view.findViewById(R.id.ShelfCard);
             cv.setCardBackgroundColor(Color.WHITE);
         }
+
+        targetShelves.clear();
     }
 }

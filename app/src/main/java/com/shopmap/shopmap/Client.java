@@ -136,7 +136,7 @@ public class Client {
         for (String s: targets) {
             temp += String.format("%s/ADD/", s);
         }
-        sendOutput(String.format("calculatePath/cmdend/%s", "test"));
+        sendOutput(String.format("calculatePath/cmdend/%s", temp));
 
         while (!update) {
             try {
