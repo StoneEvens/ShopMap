@@ -12,6 +12,14 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.shopmap.shopmap.client.Client;
+import com.shopmap.shopmap.client.ReconnectDialog;
+import com.shopmap.shopmap.mapanddistance.Intersection;
+import com.shopmap.shopmap.mapanddistance.Map;
+import com.shopmap.shopmap.mapanddistance.MapElement;
+import com.shopmap.shopmap.mapanddistance.Shelf;
+import com.shopmap.shopmap.mapanddistance.Walkway;
+
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 

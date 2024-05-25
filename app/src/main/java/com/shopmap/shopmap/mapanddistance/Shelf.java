@@ -1,4 +1,4 @@
-package com.shopmap.shopmap;
+package com.shopmap.shopmap.mapanddistance;
 
 public class Shelf extends MapElement{
     private Walkway nearestWkwy;

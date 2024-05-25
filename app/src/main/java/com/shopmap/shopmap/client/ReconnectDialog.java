@@ -1,4 +1,4 @@
-package com.shopmap.shopmap;
+package com.shopmap.shopmap.client;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;

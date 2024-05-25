@@ -1,6 +1,6 @@
-package com.shopmap.shopmap;
+package com.shopmap.shopmap.mapanddistance;
 
-import android.util.Log;
+import com.shopmap.shopmap.client.Client;
 
 import java.util.ArrayList;
 
