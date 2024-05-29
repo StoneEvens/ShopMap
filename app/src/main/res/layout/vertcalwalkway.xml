@@ -8,7 +8,7 @@
         android:id="@+id/VerticalWalkwayCard"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        app:cardBackgroundColor="#8f8f8f">
+        app:cardBackgroundColor="@color/gray">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -18,7 +18,6 @@
                 android:id="@+id/VerticalWalkwayLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Wkwy"
                 android:textColor="#000000"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

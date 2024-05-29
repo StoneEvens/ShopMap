@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
 
                             cv.setCardBackgroundColor(Color.RED);
 
-                            if (targetShelves.size() <= 20) {
+                            if (targetShelves.size() < 20 && !targetShelves.contains(element.getName())) {
                                 targetShelves.add(element.getName());
                             }
                         }
@@ -241,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
                         cv = view.findViewById(R.id.IntersectionCard);
 
                         if (cv != null) {
-                            cv.setCardBackgroundColor(Color.parseColor("#00BCD4"));
+                            cv.setCardBackgroundColor(Color.GRAY);
                         } else {
                             cv = view.findViewById(R.id.ShelfCard);
                             cv.setCardBackgroundColor(Color.WHITE);
