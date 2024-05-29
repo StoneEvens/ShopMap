@@ -20,20 +20,12 @@
         app:maxZoom="10"
         app:minZoom="0.1">
 
-        <FrameLayout
-            android:id="@+id/FrameLayout"
+        <GridLayout
+            android:id="@+id/GridLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contextClickable="true">
-
-            <GridLayout
-                android:id="@+id/GridLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:clickable="false"
-                android:contextClickable="true" />
-
-        </FrameLayout>
+            android:clickable="false"
+            android:contextClickable="true"/>
 
     </com.otaliastudios.zoom.ZoomLayout>
 

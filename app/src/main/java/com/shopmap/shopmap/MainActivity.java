@@ -93,10 +93,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!targetShelves.isEmpty()) {
-                    ArrayList<String> order = new ArrayList<String>();
+                    ArrayList<Shelf> order = new ArrayList<Shelf>();
 
                     try {
-                        order = client.getPath(targetShelves);
+                        ArrayList<String> temp = client.getPath(targetShelves);
+
+                        for (String s: temp) {
+                            MapElement mE = map.getMapElement(s);
+                            order.add((Shelf) mE);
+                        }
                     } catch (Exception e) {
                         if (!dialog.isAdded()) {
                             dialog.show(MainActivity.this.getFragmentManager(), "Reconnect");
@@ -107,18 +112,42 @@ public class MainActivity extends AppCompatActivity {
                     targetShelves.clear();
 
                     String testOutput = "";
-                    for (String s: order) {
-                        testOutput += (s + "->");
+                    for (Shelf s: order) {
+                        testOutput += (s.getName() + "->");
                     }
-                    for (String s: order) {
-                        MapElement mE = map.getMapElement(s);
-                        int index = mE.getRow() * total_Col + mE.getCol();
+                    for (Shelf s: order) {
+                        int index = s.getRow() * total_Col + s.getCol();
 
                         View view = gridLayout.getChildAt(index);
                         CardView cv = view.findViewById(R.id.ShelfCard);
                         cv.setCardBackgroundColor(Color.RED);
                     }
                     //Send product list to back end to save it in the database
+                    Route route = new Route(total_Row, total_Col, map.getStart(), map.getEnd(), order);
+
+                    boolean[][] isRoute = route.getIsRoute();
+
+                    for (int i = 0; i < total_Row; i++) {
+                        for (int j = 0; j < total_Col; j++) {
+                            if (isRoute[i][j]) {
+                                View view = gridLayout.getChildAt(i * total_Col + j);
+                                CardView cv = view.findViewById(R.id.HorizontalWalkwayCard);
+
+                                if (cv != null) {
+                                    cv.setCardBackgroundColor(Color.YELLOW);
+                                } else {
+                                    cv = view.findViewById(R.id.VerticalWalkwayCard);
+
+                                    if (cv != null) {
+                                        cv.setCardBackgroundColor(Color.YELLOW);
+                                    } else {
+                                        cv = view.findViewById(R.id.IntersectionCard);
+                                        cv.setCardBackgroundColor(Color.YELLOW);
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     debugText.setText(testOutput);
                 }
@@ -193,6 +222,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void resetMap() {
+        for (MapElement[] li: map.getMapElements()) {
+            for (MapElement mE: li) {
+                View view = gridLayout.getChildAt(mE.getRow() * total_Col + mE.getCol());
+                CardView cv = view.findViewById(R.id.HorizontalWalkwayCard);
+
+                if (cv != null) {
+                    cv.setCardBackgroundColor(Color.GRAY);
+                } else {
+                    cv = view.findViewById(R.id.VerticalWalkwayCard);
+
+                    if (cv != null) {
+                        cv.setCardBackgroundColor(Color.GRAY);
+                    } else {
+                        cv = view.findViewById(R.id.IntersectionCard);
+
+                        if (cv != null) {
+                            cv.setCardBackgroundColor(Color.parseColor("#00BCD4"));
+                        } else {
+                            cv = view.findViewById(R.id.ShelfCard);
+                            cv.setCardBackgroundColor(Color.WHITE);
+                        }
+                    }
+                }
+            }
+        }
+        /*
         for (Shelf s: map.getShelves()) {
             int index = s.getRow() * total_Col + s.getCol();
 
@@ -200,6 +255,8 @@ public class MainActivity extends AppCompatActivity {
             CardView cv = view.findViewById(R.id.ShelfCard);
             cv.setCardBackgroundColor(Color.WHITE);
         }
+
+         */
 
         targetShelves.clear();
     }
