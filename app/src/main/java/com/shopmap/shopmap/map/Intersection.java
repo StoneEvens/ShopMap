@@ -1,4 +1,4 @@
-package com.shopmap.shopmap.mapanddistance;
+package com.shopmap.shopmap.map;
 
 public class Intersection extends MapElement{
     public Intersection() {

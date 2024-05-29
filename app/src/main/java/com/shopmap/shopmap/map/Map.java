@@ -1,4 +1,4 @@
-package com.shopmap.shopmap.mapanddistance;
+package com.shopmap.shopmap.map;
 
 import com.shopmap.shopmap.client.Client;
 

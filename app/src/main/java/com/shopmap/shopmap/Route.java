@@ -1,8 +1,8 @@
 package com.shopmap.shopmap;
 
-import com.shopmap.shopmap.mapanddistance.Intersection;
-import com.shopmap.shopmap.mapanddistance.MapElement;
-import com.shopmap.shopmap.mapanddistance.Shelf;
+import com.shopmap.shopmap.map.Intersection;
+import com.shopmap.shopmap.map.MapElement;
+import com.shopmap.shopmap.map.Shelf;
 
 import java.util.ArrayList;
 
@@ -25,12 +25,40 @@ public class Route {
     }
 
     public void calculateRoute() {
+        findPath(entrance, targetShelves.get(0));
+
         for (int i = 0; i < targetShelves.size() - 1; i++) {
             Shelf start = targetShelves.get(i);
             Shelf end = targetShelves.get(i + 1);
 
             findPath(start, end);
         }
+
+        findPath(exit, targetShelves.get(targetShelves.size() - 1));
+    }
+
+    private void findPath(Intersection itsc, Shelf shelf) {
+        ArrayList<Intersection> shelfIntersections = new ArrayList<>();
+        shelfIntersections.add(shelf.getWkwy().getAisle().getItsc1());
+        shelfIntersections.add(shelf.getWkwy().getAisle().getItsc2());
+
+        int tempD = 1000;
+        Intersection closestItsc = new Intersection();
+
+        for (Intersection eI: shelfIntersections) {
+            int d = Math.abs(itsc.getRow() - eI.getRow()) * shelf.getWkwy().getDistanceMultiplier()[0] + Math.abs(itsc.getCol() - eI.getCol()) * shelf.getWkwy().getDistanceMultiplier()[1];
+
+            d += Math.abs(shelf.getRow() - eI.getRow()) * shelf.getWkwy().getDistanceMultiplier()[0] + Math.abs(shelf.getCol() - eI.getCol()) * shelf.getWkwy().getDistanceMultiplier()[1];
+
+            if (d < tempD) {
+                tempD = d;
+                closestItsc = eI;
+            }
+        }
+
+        setRoute(itsc, closestItsc);
+
+        setRoute(closestItsc, shelf);
     }
 
     private void findPath(Shelf start, Shelf end) {
@@ -47,16 +75,16 @@ public class Route {
 
         for (Intersection sI: startItscs) {
             for (Intersection eI: endItscs) {
-                int d = Math.abs(sI.getRow() - eI.getRow()) + Math.abs(sI.getCol() - eI.getCol());
+                int d = 0;
 
                 if (!start.getWkwy().getAisle().equals(end.getWkwy().getAisle())) {
-                    d += Math.abs(sI.getRow() - start.getRow()) * start.getWkwy().getDistanceMultiplier()[0] + Math.abs(sI.getCol() - start.getCol()) * start.getWkwy().getDistanceMultiplier()[1];
-                    d += Math.abs(end.getRow() - eI.getRow()) * end.getWkwy().getDistanceMultiplier()[0] + Math.abs(end.getCol() - eI.getCol()) * end.getWkwy().getDistanceMultiplier()[1];
-                } else {
-                    d += Math.abs(start.getRow() - end.getRow()) * start.getWkwy().getDistanceMultiplier()[0] + Math.abs(start.getCol() - end.getCol()) * start.getWkwy().getDistanceMultiplier()[1];
+                    d += Math.abs(sI.getRow() - eI.getRow()) * start.getWkwy().getDistanceMultiplier()[0] + Math.abs(sI.getCol() - eI.getCol()) * end.getWkwy().getDistanceMultiplier()[1];
                 }
 
-                if (d <= tempD) {
+                d += Math.abs(sI.getRow() - start.getRow()) * start.getWkwy().getDistanceMultiplier()[0] + Math.abs(sI.getCol() - start.getCol()) * start.getWkwy().getDistanceMultiplier()[1];
+                d += Math.abs(end.getRow() - eI.getRow()) * end.getWkwy().getDistanceMultiplier()[0] + Math.abs(end.getCol() - eI.getCol()) * end.getWkwy().getDistanceMultiplier()[1];
+
+                if (d < tempD) {
                     tempD = d;
                     closestItscs[0] = sI;
                     closestItscs[1] = eI;
@@ -64,14 +92,26 @@ public class Route {
             }
         }
 
-        setRoute(start.getWkwy(), closestItscs[0]);
+        if (!start.getWkwy().getAisle().equals(end.getWkwy().getAisle())) {
+            setRoute(start.getWkwy(), closestItscs[0]);
 
-        setRoute(closestItscs[0], closestItscs[1]);
+            setRoute(closestItscs[0], closestItscs[1]);
 
-        setRoute(closestItscs[1], end.getWkwy());
+            setRoute(closestItscs[1], end.getWkwy());
+        } else {
+            setRoute(start.getWkwy(), end.getWkwy());
+        }
     }
 
     private void setRoute(MapElement start, MapElement end) {
+        if (start instanceof Shelf) {
+            start = ((Shelf) start).getWkwy();
+        }
+
+        if (end instanceof  Shelf) {
+            end = ((Shelf) end).getWkwy();
+        }
+
         int startRow = start.getRow();
         int startCol = start.getCol();
 

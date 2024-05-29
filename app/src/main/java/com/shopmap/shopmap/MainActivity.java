@@ -14,11 +14,11 @@ import androidx.cardview.widget.CardView;
 
 import com.shopmap.shopmap.client.Client;
 import com.shopmap.shopmap.client.ReconnectDialog;
-import com.shopmap.shopmap.mapanddistance.Intersection;
-import com.shopmap.shopmap.mapanddistance.Map;
-import com.shopmap.shopmap.mapanddistance.MapElement;
-import com.shopmap.shopmap.mapanddistance.Shelf;
-import com.shopmap.shopmap.mapanddistance.Walkway;
+import com.shopmap.shopmap.map.Intersection;
+import com.shopmap.shopmap.map.Map;
+import com.shopmap.shopmap.map.MapElement;
+import com.shopmap.shopmap.map.Shelf;
+import com.shopmap.shopmap.map.Walkway;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -142,7 +142,10 @@ public class MainActivity extends AppCompatActivity {
                                         cv.setCardBackgroundColor(Color.YELLOW);
                                     } else {
                                         cv = view.findViewById(R.id.IntersectionCard);
-                                        cv.setCardBackgroundColor(Color.YELLOW);
+
+                                        if (cv != null) {
+                                            cv.setCardBackgroundColor(Color.YELLOW);
+                                        }
                                     }
                                 }
                             }
@@ -247,16 +250,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        /*
-        for (Shelf s: map.getShelves()) {
-            int index = s.getRow() * total_Col + s.getCol();
-
-            View view = gridLayout.getChildAt(index);
-            CardView cv = view.findViewById(R.id.ShelfCard);
-            cv.setCardBackgroundColor(Color.WHITE);
-        }
-
-         */
 
         targetShelves.clear();
     }
