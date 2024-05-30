@@ -20,7 +20,7 @@ public class Client {
     private String ip;
 
     public Client() {
-        ip = "192.168.124.83";
+        ip = "192.168.40.128";
         connected = false;
         input = "";
 
@@ -155,8 +155,15 @@ public class Client {
         return path;
     }
 
+    //getShelfProduct
     public void getProduct(String shelfID) {
         sendOutput(String.format("getProducts/cmdend/%s", shelfID));
+        //picture
+        //name
+        //price
+        //description
+        //comments
+        //storeID
 
         while (!update) {
             try {
@@ -168,5 +175,25 @@ public class Client {
 
         input = "";
         update = false;
+    }
+
+    public void registerUser() {
+
+    }
+
+    public void getComments(String user) {
+
+    }
+
+    public void writeComments(String user, String product) {
+
+    }
+
+    public void getHistoryCart(String user) {
+
+    }
+
+    public void getUser() {
+
     }
 }
