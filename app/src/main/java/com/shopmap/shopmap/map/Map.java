@@ -3,13 +3,15 @@ package com.shopmap.shopmap.map;
 import com.shopmap.shopmap.client.Client;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Map {
     private ArrayList<Aisle> aisles;
     private String[] storeInfo;
     private ArrayList<Shelf> shelves;
     private MapElement[][] mapElements;
-    private Client client;
+    private final Client client;
 
     public Map(Client client) {
         this.client = client;
@@ -26,11 +28,97 @@ public class Map {
     //This should be public void getData(String values)
     private void getData(String[] info) {
         this.storeInfo = info[0].split("/ADD/");
-
+        int totalRow = Integer.parseInt(storeInfo[0]);
+        int totalCol = Integer.parseInt(storeInfo[1]);
 
         //Instantiate mapElements
         mapElements = new MapElement[Integer.parseInt(storeInfo[0])][Integer.parseInt(storeInfo[1])];
+        int[][] mapMatrix = new int[totalRow][totalCol];
 
+        for (int i = 0; i < totalRow; i++) {
+            for (int j = 0; j < totalCol; j++) {
+                mapMatrix[i][j] = 0;
+            }
+        }
+
+        //Put Intersection
+        for (String s: info[1].split("/ADD/")) {
+            String[] temp = s.split(", ");
+            int row = Integer.parseInt(temp[1]);
+            int col = Integer.parseInt(temp[2]);
+
+            mapMatrix[row][col] = 1;
+        }
+
+        //Put Shelves
+        //Put wkwyLocation
+        Queue<int[]> wkwyLocationQueue = new LinkedList<int[]>();
+
+        for (String s: info[2].split("/ADD/")) {
+            String[] temp = s.split(", ");
+            int row = Integer.parseInt(temp[2]);
+            int col = Integer.parseInt(temp[3]);
+
+            int[] wkwyLocation = new int[2];
+
+            switch (temp[1]) {
+                case "TOP":
+                    wkwyLocation = new int[] {-1, 0};
+                    break;
+                case "BOTTOM":
+                    wkwyLocation = new int[] {1, 0};
+                    break;
+            }
+
+            mapMatrix[row][col] = 2;
+            wkwyLocationQueue.add(wkwyLocation);
+        }
+
+        int itscCnt = 0;
+        int shelfCnt = 0;
+
+        int row = 0;
+        for (int[] li: mapMatrix) {
+            int col = 0;
+
+            for (int i: li) {
+                if (i == 0) {
+                    Walkway wkwy = new Walkway("Wkwy", row, col, new Aisle());
+                    mapElements[row][col] = wkwy;
+                } else if (i == 1) {
+                    Intersection itsc = new Intersection("Itsc" + itscCnt, row, col);
+                    mapElements[row][col] = itsc;
+                    itscCnt++;
+                }
+
+                col++;
+            }
+
+            row++;
+        }
+
+        row = 0;
+        for (int[] li: mapMatrix) {
+            int col = 0;
+
+            for (int i: li) {
+                if (i == 2) {
+                    int[] temp = wkwyLocationQueue.poll();
+
+                    Walkway w = (Walkway) mapElements[row + temp[0]][col + temp[1]];
+                    Shelf shelf = new Shelf("S" + shelfCnt, row, col, w, temp);
+                    mapElements[row][col] = shelf;
+                    shelves.add(shelf);
+                    shelfCnt++;
+                }
+
+                col++;
+            }
+
+            row++;
+        }
+
+        /*
         //Always Create Intersection First
         //The itsc id need to changed after the sql is done
         int cnt = 0;
@@ -82,6 +170,8 @@ public class Map {
 
             k++;
         }
+
+         */
 
         //Create Aisle
         int r = 0;
@@ -172,11 +262,11 @@ public class Map {
     }
 
     public Intersection getStart() {
-        return (Intersection) getMapElement(storeInfo[2]);
+        return (Intersection) getMapElement("Itsc" + storeInfo[2]);
     }
 
     public Intersection getEnd() {
-        return (Intersection) getMapElement(storeInfo[3]);
+        return (Intersection) getMapElement("Itsc" + storeInfo[3]);
     }
 
     public String[] getStoreInfo() {

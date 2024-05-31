@@ -177,23 +177,116 @@ public class Client {
         update = false;
     }
 
-    public void registerUser() {
+    public void registerUser(String userID, String password) {
+        sendOutput(String.format("registerUser/cmdend/%s/ADD/%s", userID, password));
 
+        while (!update) {
+            try {
+                TimeUnit.MILLISECONDS.wait(100);
+            } catch (InterruptedException e1) {
+
+            }
+        }
+
+        input = "";
+        update = false;
     }
 
-    public void getComments(String user) {
+    public ArrayList<String> getUserComments(String userID) {
+        sendOutput(String.format("getUserComments/cmdend/%s", userID));
 
+        while (!update) {
+            try {
+                TimeUnit.MILLISECONDS.wait(100);
+            } catch (InterruptedException e1) {
+
+            }
+        }
+
+        ArrayList<String> comments = new ArrayList<String>();
+        comments.addAll(Arrays.asList(input.split("/ADD/")));
+
+        input = "";
+        update = false;
+
+        return comments;
     }
 
-    public void writeComments(String user, String product) {
+    public ArrayList<String> getProductComments(String productID) {
+        sendOutput(String.format("getProductComments/cmdend/%s", productID));
 
+        while (!update) {
+            try {
+                TimeUnit.MILLISECONDS.wait(100);
+            } catch (InterruptedException e1) {
+
+            }
+        }
+
+        ArrayList<String> comments = new ArrayList<String>();
+        comments.addAll(Arrays.asList(input.split("/ADD/")));
+
+        input = "";
+        update = false;
+
+        return comments;
     }
 
-    public void getHistoryCart(String user) {
+    public void writeComments(String userID, String product, String comment) {
+        sendOutput(String.format("writeComments/cmdend/%s/ADD/%s/ADD/%s", product, userID, comment));
 
+        while (!update) {
+            try {
+                TimeUnit.MILLISECONDS.wait(100);
+            } catch (InterruptedException e1) {
+
+            }
+        }
+
+        input = "";
+        update = false;
     }
 
-    public void getUser() {
+    public ArrayList<String> getHistoryCart(String userID) {
+        sendOutput(String.format("getHistoryCart/cmdend/%s", userID));
 
+        while (!update) {
+            try {
+                TimeUnit.MILLISECONDS.wait(100);
+            } catch (InterruptedException e1) {
+
+            }
+        }
+
+        ArrayList<String> carts = new ArrayList<String>();
+        carts.addAll(Arrays.asList(input.split("/ADD/")));
+
+        input = "";
+        update = false;
+
+        return carts;
+    }
+
+    public boolean getUser(String userID) {
+        sendOutput(String.format("getUser/cmdend/%s", userID));
+
+        while (!update) {
+            try {
+                TimeUnit.MILLISECONDS.wait(100);
+            } catch (InterruptedException e1) {
+
+            }
+        }
+
+        boolean foundUser = false;
+
+        if (input.equals("True")) {
+            foundUser = true;
+        }
+
+        input = "";
+        update = false;
+
+        return foundUser;
     }
 }
