@@ -136,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
                             cv.setCardBackgroundColor(Color.RED);
 
+                            //Change after this
                             if (targetShelves.size() < 20 && !targetShelves.contains(element.getName())) {
                                 targetShelves.add(element.getName());
                             }
