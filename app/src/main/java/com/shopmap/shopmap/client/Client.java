@@ -6,7 +6,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +42,7 @@ public class Client {
 
                     while (connected) {
                         String temp = "";
-                        if (!(temp = dis.readUTF().toString()).equals("Test_Connection")) {
+                        if (!(temp = dis.readUTF()).equals("Test_Connection")) {
                             input = temp;
                         }
 
@@ -57,9 +56,7 @@ public class Client {
                     try {
                         socket.close();
                     } catch (IOException e2) {
-
-                    } catch (NullPointerException e3) {
-
+                        Log.i("Debug", "Something is Fucked");
                     }
                 }
             }
@@ -76,17 +73,11 @@ public class Client {
             public void run() {
                 try {
                     if (!output.equals("")) {
-                        Log.i("Debug", "Request Sent to Server");
-                        Log.i("Debug", output);
                         dos.writeUTF(output);
-                        Log.i("Debug", "Request Stored");
                         dos.flush();
-                        Log.i("Debug", "Request Flushed");
                     }
                 } catch (IOException e1) {
                     Log.i("Debug", "Something is Fucked");
-                } catch (NullPointerException e2) {
-
                 }
             }
         });
@@ -119,7 +110,7 @@ public class Client {
             try {
                 TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e1) {
-
+                Log.i("Debug", "Wait Interrupted");
             }
         }
 
@@ -142,7 +133,7 @@ public class Client {
             try {
                 TimeUnit.MILLISECONDS.wait(100);
             } catch (InterruptedException e1) {
-
+                Log.i("Debug", "Wait Interrupted");
             }
         }
 
@@ -169,7 +160,7 @@ public class Client {
             try {
                 TimeUnit.MILLISECONDS.wait(100);
             } catch (InterruptedException e1) {
-
+                Log.i("Debug", "Wait Interrupted");
             }
         }
 
@@ -184,7 +175,7 @@ public class Client {
             try {
                 TimeUnit.MILLISECONDS.wait(100);
             } catch (InterruptedException e1) {
-
+                Log.i("Debug", "Wait Interrupted");
             }
         }
 
@@ -199,7 +190,7 @@ public class Client {
             try {
                 TimeUnit.MILLISECONDS.wait(100);
             } catch (InterruptedException e1) {
-
+                Log.i("Debug", "Wait Interrupted");
             }
         }
 
@@ -219,7 +210,7 @@ public class Client {
             try {
                 TimeUnit.MILLISECONDS.wait(100);
             } catch (InterruptedException e1) {
-
+                Log.i("Debug", "Wait Interrupted");
             }
         }
 
@@ -239,7 +230,7 @@ public class Client {
             try {
                 TimeUnit.MILLISECONDS.wait(100);
             } catch (InterruptedException e1) {
-
+                Log.i("Debug", "Wait Interrupted");
             }
         }
 
@@ -254,7 +245,7 @@ public class Client {
             try {
                 TimeUnit.MILLISECONDS.wait(100);
             } catch (InterruptedException e1) {
-
+                Log.i("Debug", "Wait Interrupted");
             }
         }
 
@@ -274,15 +265,11 @@ public class Client {
             try {
                 TimeUnit.MILLISECONDS.wait(100);
             } catch (InterruptedException e1) {
-
+                Log.i("Debug", "Wait Interrupted");
             }
         }
 
-        boolean foundUser = false;
-
-        if (input.equals("True")) {
-            foundUser = true;
-        }
+        boolean foundUser = input.equals("True");
 
         input = "";
         update = false;

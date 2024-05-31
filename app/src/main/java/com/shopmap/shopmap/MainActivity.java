@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                             Log.i("Client Status", String.format("%s", client.getConnected()));
                             this.wait(10000 * dialog.getMultiplier());
                         } catch (InterruptedException e) {
-
+                            Log.i("Debug", "Wait Interrupted");
                         }
                     }
                 }
