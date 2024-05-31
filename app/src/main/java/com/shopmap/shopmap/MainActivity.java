@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> targetShelves;
     int total_Row, total_Col;
 
+    //Initiate client and map (server must be on)
     public MainActivity() throws InterruptedException {
         client = new Client();
 
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         check();
     }
 
+    //This part constantly checks if the client is still connected to the server
     public void check() {
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -78,9 +80,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         setContentView(R.layout.activity_main);
 
         total_Row = Integer.parseInt(map.getStoreInfo()[0]);
@@ -90,74 +89,9 @@ public class MainActivity extends AppCompatActivity {
 
         gridLayout = findViewById(R.id.GridLayout);
         testButton = findViewById(R.id.pathButton);
-        testButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!targetShelves.isEmpty()) {
-                    ArrayList<Shelf> order = new ArrayList<Shelf>();
+        testButton.setOnClickListener(new CalculatePathListener());
 
-                    try {
-                        ArrayList<String> temp = client.getPath(targetShelves);
-
-                        for (String s: temp) {
-                            MapElement mE = map.getMapElement(s);
-                            order.add((Shelf) mE);
-                        }
-                    } catch (Exception e) {
-                        if (!dialog.isAdded()) {
-                            dialog.show(MainActivity.this.getFragmentManager(), "Reconnect");
-                        }
-                    }
-
-                    resetMap();
-                    targetShelves.clear();
-
-                    String testOutput = "";
-                    for (Shelf s: order) {
-                        testOutput += (s.getName() + "->");
-                    }
-                    for (Shelf s: order) {
-                        int index = s.getRow() * total_Col + s.getCol();
-
-                        View view = gridLayout.getChildAt(index);
-                        CardView cv = view.findViewById(R.id.ShelfCard);
-                        cv.setCardBackgroundColor(Color.RED);
-                    }
-                    //Send product list to back end to save it in the database
-                    Route route = new Route(total_Row, total_Col, map.getStart(), map.getEnd(), order);
-
-                    boolean[][] isRoute = route.getIsRoute();
-
-                    for (int i = 0; i < total_Row; i++) {
-                        for (int j = 0; j < total_Col; j++) {
-                            if (isRoute[i][j]) {
-                                View view = gridLayout.getChildAt(i * total_Col + j);
-                                CardView cv = view.findViewById(R.id.HorizontalWalkwayCard);
-
-                                if (cv != null) {
-                                    cv.setCardBackgroundColor(Color.YELLOW);
-                                } else {
-                                    cv = view.findViewById(R.id.VerticalWalkwayCard);
-
-                                    if (cv != null) {
-                                        cv.setCardBackgroundColor(Color.YELLOW);
-                                    } else {
-                                        cv = view.findViewById(R.id.IntersectionCard);
-
-                                        if (cv != null) {
-                                            cv.setCardBackgroundColor(Color.YELLOW);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    debugText.setText(testOutput);
-                }
-            }
-        });
-
+        //Reset map when button is clicked
         resetButton = findViewById(R.id.resetButton);
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -169,6 +103,12 @@ public class MainActivity extends AppCompatActivity {
         gridLayout.setRowCount(total_Row);
         gridLayout.setColumnCount(total_Col);
 
+        //Construct the map
+        constructMap();
+    }
+
+    //The function that constructs the map
+    private void constructMap() {
         int i = 0;
         for (MapElement[] li: map.getMapElements()) {
             int j = 0;
@@ -225,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //The function that resets the map
     private void resetMap() {
         for (MapElement[] li: map.getMapElements()) {
             for (MapElement mE: li) {
@@ -253,5 +194,73 @@ public class MainActivity extends AppCompatActivity {
         }
 
         targetShelves.clear();
+    }
+
+    private class CalculatePathListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            if (!targetShelves.isEmpty()) {
+                ArrayList<Shelf> order = new ArrayList<Shelf>();
+
+                try {
+                    ArrayList<String> temp = client.getPath(targetShelves);
+
+                    for (String s: temp) {
+                        MapElement mE = map.getMapElement(s);
+                        order.add((Shelf) mE);
+                    }
+                } catch (Exception e) {
+                    if (!dialog.isAdded()) {
+                        dialog.show(MainActivity.this.getFragmentManager(), "Reconnect");
+                    }
+                }
+
+                resetMap();
+                targetShelves.clear();
+
+                String testOutput = "";
+                for (Shelf s: order) {
+                    testOutput += (s.getName() + "->");
+                }
+                for (Shelf s: order) {
+                    int index = s.getRow() * total_Col + s.getCol();
+
+                    View view = gridLayout.getChildAt(index);
+                    CardView cv = view.findViewById(R.id.ShelfCard);
+                    cv.setCardBackgroundColor(Color.RED);
+                }
+                //Send product list to back end to save it in the database
+                Route route = new Route(total_Row, total_Col, map.getStart(), map.getEnd(), order);
+
+                boolean[][] isRoute = route.getIsRoute();
+
+                for (int i = 0; i < total_Row; i++) {
+                    for (int j = 0; j < total_Col; j++) {
+                        if (isRoute[i][j]) {
+                            View view = gridLayout.getChildAt(i * total_Col + j);
+                            CardView cv = view.findViewById(R.id.HorizontalWalkwayCard);
+
+                            if (cv != null) {
+                                cv.setCardBackgroundColor(Color.YELLOW);
+                            } else {
+                                cv = view.findViewById(R.id.VerticalWalkwayCard);
+
+                                if (cv != null) {
+                                    cv.setCardBackgroundColor(Color.YELLOW);
+                                } else {
+                                    cv = view.findViewById(R.id.IntersectionCard);
+
+                                    if (cv != null) {
+                                        cv.setCardBackgroundColor(Color.YELLOW);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                debugText.setText(testOutput);
+            }
+        }
     }
 }
