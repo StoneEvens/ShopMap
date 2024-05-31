@@ -19,8 +19,8 @@ public class Map {
 
     //This should be public void constructMap(String values);
     public void constructMap(String storeID) {
-        aisles = new ArrayList<Aisle>();
-        shelves = new ArrayList<Shelf>();
+        aisles = new ArrayList<>();
+        shelves = new ArrayList<>();
 
         getData(client.getStoreInfo(storeID));
     }
@@ -52,7 +52,7 @@ public class Map {
 
         //Put Shelves
         //Put wkwyLocation
-        Queue<int[]> wkwyLocationQueue = new LinkedList<int[]>();
+        Queue<int[]> wkwyLocationQueue = new LinkedList<>();
 
         for (String s: info[2].split("/ADD/")) {
             String[] temp = s.split(", ");
@@ -105,6 +105,7 @@ public class Map {
                 if (i == 2) {
                     int[] temp = wkwyLocationQueue.poll();
 
+                    assert temp != null;
                     Walkway w = (Walkway) mapElements[row + temp[0]][col + temp[1]];
                     Shelf shelf = new Shelf("S" + shelfCnt, row, col, w, temp);
                     mapElements[row][col] = shelf;
@@ -175,11 +176,11 @@ public class Map {
 
         //Create Aisle
         int r = 0;
-        int c = -1;
+        int c;
 
         for (MapElement[] li : mapElements) {
             c = -1;
-            int indexA = -1;
+            int indexA;
             int indexB = -1;
 
             for (int i = 0; i < li.length; i++) {
