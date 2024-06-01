@@ -19,7 +19,7 @@ public class Client {
     private String ip;
 
     public Client() {
-        ip = "192.168.40.128";
+        ip = "192.168.124.83";
         connected = false;
         input = "";
 
@@ -84,15 +84,22 @@ public class Client {
 
         thread.start();
 
-        for (int i = 0; i < 100; i++) {
-            Log.i("Debug", String.format("%s, %s", connected, update));
-
+        for (int i = 0; i < 100 && connected && !update; i++) {
+            //Log.i("Debug", String.format("%s, %s", connected, update));
+            /*
             if (connected && !update) {
                 try {
                     TimeUnit.MILLISECONDS.sleep(100);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+            }
+
+             */
+            try {
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
 

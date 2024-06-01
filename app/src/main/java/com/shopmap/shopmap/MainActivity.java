@@ -14,7 +14,7 @@ import androidx.cardview.widget.CardView;
 
 import com.shopmap.shopmap.client.Client;
 import com.shopmap.shopmap.client.ReconnectDialog;
-import com.shopmap.shopmap.distanceanddisplay.Route;
+import com.shopmap.shopmap.route.Route;
 import com.shopmap.shopmap.map.Intersection;
 import com.shopmap.shopmap.map.Map;
 import com.shopmap.shopmap.map.MapElement;

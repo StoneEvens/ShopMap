@@ -1,4 +1,4 @@
-package com.shopmap.shopmap.distanceanddisplay;
+package com.shopmap.shopmap.route;
 
 import com.shopmap.shopmap.map.Intersection;
 import com.shopmap.shopmap.map.MapElement;
